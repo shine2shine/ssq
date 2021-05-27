@@ -50,19 +50,18 @@ class Ssq():
         url = 'http://zjflcp.zjol.com.cn/fcweb/ssq.html'
         r = self.session.get(url,headers=self.headers)
         s = r.text
-        # 找到当前最先期数
-        n1 = s.find('qishu')
-        n1 += 6
-        n2 = n1 + 7
-        qishu = s[n1:n2]
 
-        # 进入最先期数的开奖页面
+        # 找到最新期数
+        s = re.search('qishu=\d+',s).group()
+        qishu = re.search('\d+',s).group()
+
+        # 进入最新期数的开奖页面
         url = 'http://zjflcp.zjol.com.cn/fcweb/ssq_d.html?qishu={:s}'.format(qishu)
         r = self.session.get(url,headers = self.headers)
         s = r.text 
         
         # 获取开奖结果和各级奖金 
-        result = get_result(s)
+        result = self.get_result(s)
         self.balls = result[:2]
         self.rewards = result[2]
         self.rewards.append(0)
@@ -100,25 +99,25 @@ class Ssq():
                 reward = self.rewards[reward_level]
                 print('{}, red {:<16s}, blue{:>2s}，奖金：{}'.format(my_lottery,str(matched_red),matched_blue,reward))
 
-def get_result(s):
+    def get_result(self,s):
 
 
-    soup = BeautifulSoup(s,features="lxml")
+        soup = BeautifulSoup(s,features="lxml")
 
-    reds = []
-    balls = soup.find_all(name = 'ul',attrs= {'class':'ssqUl'})
+        reds = []
+        balls = soup.find_all(name = 'ul',attrs= {'class':'ssqUl'})
 
-    s_balls = str(balls)
-    l_balls = re.findall('\d+',s_balls)
-    reds =l_balls[:6]
-    blue = l_balls[-1]
+        s_balls = str(balls)
+        l_balls = re.findall('\d+',s_balls)
+        reds =l_balls[:6]
+        blue = l_balls[-1]
 
-    amounts = soup.find_all(name = 'li',attrs= {'class':'amount'})
+        amounts = soup.find_all(name = 'li',attrs= {'class':'amount'})
 
-    s_amounts = str(amounts)
-    amounts = re.findall('\d+',s_amounts)
+        s_amounts = str(amounts)
+        amounts = re.findall('\d+',s_amounts)
 
-    return [reds,blue,amounts]
+        return [reds,blue,amounts]
 
 
 
