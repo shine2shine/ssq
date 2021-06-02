@@ -2,7 +2,9 @@ import re
 import requests
 import json 
 from bs4 import BeautifulSoup
+import os
 
+_path = os.path.split(os.path.abspath(__file__))[0]
 
 class Ssq():
     def __init__(self) -> None:
@@ -42,7 +44,8 @@ class Ssq():
             16: 0
         }
 
-        with open('my_lottery.json','r') as f:
+        fn = os.path.join(_path,'my_lottery.json')
+        with open(fn,'r') as f:
             self.my_lottery = json.load(f)
         
     def fetch_data(self):
