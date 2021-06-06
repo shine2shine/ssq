@@ -57,12 +57,15 @@ class Ssq():
         # 找到最新期数
         s = re.search('qishu=\d+',s).group()
         qishu = re.search('\d+',s).group()
+        self.last_no = qishu 
 
         # 进入最新期数的开奖页面
         url = 'http://zjflcp.zjol.com.cn/fcweb/ssq_d.html?qishu={:s}'.format(qishu)
         r = self.session.get(url,headers = self.headers)
         s = r.text 
-        
+        # with open('txt.txt','w',encoding= 'utf8') as f:
+        #     f.write(s)
+
         # 获取开奖结果和各级奖金 
         result = self.get_result(s)
         self.balls = result[:2]
@@ -74,6 +77,8 @@ class Ssq():
 
         reds = self.balls[0]
         blue = self.balls[1]
+        print('开奖日期: {}'.format(self.last_dt))
+        print('开奖期数: {}'.format(self.last_no))
         print('开奖号码:{}'.format(self.balls))
         for group in self.my_lottery:
             print('group:{}:'.format(group))
@@ -110,6 +115,9 @@ class Ssq():
         reds = []
         balls = soup.find_all(name = 'ul',attrs= {'class':'ssqUl'})
 
+        dt_ = str(soup.find_all(attrs = {'class':'ssqTopRig'})[0])
+        dt = re.search('\d+.*<',dt_).group()[:-10]
+        self.last_dt = dt 
         s_balls = str(balls)
         l_balls = re.findall('\d+',s_balls)
         reds =l_balls[:6]
@@ -131,3 +139,5 @@ if __name__ == '__main__':
     ssq = Ssq()
     ssq.fetch_data()
     ssq.check_result()
+    input('press enter to exit')
+    
