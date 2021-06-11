@@ -3,6 +3,8 @@ import requests
 import json 
 from bs4 import BeautifulSoup
 import os
+import easygui
+
 
 _path = os.path.split(os.path.abspath(__file__))[0]
 
@@ -45,7 +47,7 @@ class Ssq():
         }
 
         fn = os.path.join(_path,'my_lottery.json')
-        with open(fn,'r') as f:
+        with open(fn,'r',encoding='utf8') as f:
             self.my_lottery = json.load(f)
         
     def fetch_data(self):
@@ -77,11 +79,18 @@ class Ssq():
 
         reds = self.balls[0]
         blue = self.balls[1]
-        print('开奖日期: {}'.format(self.last_dt))
-        print('开奖期数: {}'.format(self.last_no))
-        print('开奖号码:{}'.format(self.balls))
+
+        
+        # print('开奖日期: {}'.format(self.last_dt))
+        result = '开奖日期: {}\n'.format(self.last_dt) 
+        # print('开奖期数: {}\n'.format(self.last_no))
+        result +=  '开奖期数: {}'.format(self.last_no)
+        # print('开奖号码:{}'.format(self.balls))
+        result += '开奖号码:{}\n'.format(self.balls)
+
         for group in self.my_lottery:
-            print('group:{}:'.format(group))
+            # print('{}:'.format(group))
+            result += '{}:\n'.format(group)
             for my_lottery in self.my_lottery[group]:
 
                 balls = my_lottery.split('+')
@@ -105,7 +114,10 @@ class Ssq():
  
                 reward_level = self.prize_level[r]
                 reward = self.rewards[reward_level]
-                print('{}, red {:<16s}, blue{:>2s}，奖金：{}'.format(my_lottery,str(matched_red),matched_blue,reward))
+                # print('{}, red {:<16s}, blue{:>2s}，奖金：{}'.format(my_lottery,str(matched_red),matched_blue,reward))
+                result += '{}, red {:<16s}, blue{:>2s}，奖金：{}\n'.format(my_lottery,str(matched_red),matched_blue,reward)
+        return result
+
 
     def get_result(self,s):
 
@@ -138,6 +150,5 @@ if __name__ == '__main__':
 
     ssq = Ssq()
     ssq.fetch_data()
-    ssq.check_result()
-    input('press enter to exit')
-    
+    r = ssq.check_result()
+    easygui.msgbox(r)    
